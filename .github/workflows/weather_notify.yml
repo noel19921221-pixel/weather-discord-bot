@@ -22,6 +22,8 @@ jobs:
       - name: Run weather notify
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
           LATITUDE: ${{ vars.LATITUDE }}
           LONGITUDE: ${{ vars.LONGITUDE }}
           LOCATION_NAME: ${{ vars.LOCATION_NAME }}

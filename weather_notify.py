@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import requests
 from datetime import datetime, timezone, timedelta
@@ -5,38 +6,37 @@ from datetime import datetime, timezone, timedelta
 DISCORD_WEBHOOK_URL = os.environ["DISCORD_WEBHOOK_URL"]
 LATITUDE      = float(os.environ.get("LATITUDE",  "35.6074"))
 LONGITUDE     = float(os.environ.get("LONGITUDE", "140.1065"))
-LOCATION_NAME = os.environ.get("LOCATION_NAME", "幕張本郷（千葉市花見川区）")
+LOCATION_NAME = os.environ.get("LOCATION_NAME", "\u5e55\u5f35\u672c\u90f7\uff08\u5343\u8449\u5e02\u82b1\u898b\u5ddd\u533a\uff09")
 
 JST = timezone(timedelta(hours=9))
 
 WEATHER_CODES = {
-    0:  ("快晴",          "☀️"),
-    1:  ("ほぼ晴れ",      "🌤️"),
-    2:  ("部分的に曇り",  "⛅"),
-    3:  ("曇り",          "☁️"),
-    45: ("霧",            "🌫️"),
-    48: ("霧氷",          "🌫️"),
-    51: ("霧雨（弱）",    "🌦️"),
-    53: ("霧雨",          "🌦️"),
-    55: ("霧雨（強）",    "🌧️"),
-    61: ("小雨",          "🌧️"),
-    63: ("雨",            "🌧️"),
-    65: ("大雨",          "🌧️"),
-    71: ("小雪",          "🌨️"),
-    73: ("雪",            "❄️"),
-    75: ("大雪",          "❄️"),
-    80: ("にわか雨",      "🌦️"),
-    81: ("にわか雨（中）","🌧️"),
-    82: ("にわか雨（強）","⛈️"),
-    95: ("雷雨",          "⛈️"),
-    96: ("雷雨+ひょう",   "⛈️"),
-    99: ("雷雨+大ひょう", "⛈️"),
+    0:  ("\u5feb\u6674",          "\u2600\ufe0f"),
+    1:  ("\u307b\u307c\u6674\u308c",      "\U0001f324\ufe0f"),
+    2:  ("\u90e8\u5206\u7684\u306b\u66c7\u308a",  "\u26c5"),
+    3:  ("\u66c7\u308a",          "\u2601\ufe0f"),
+    45: ("\u971e",            "\U0001f32b\ufe0f"),
+    48: ("\u971e\u6c37",          "\U0001f32b\ufe0f"),
+    51: ("\u971e\u96e8\uff08\u5f31\uff09",    "\U0001f326\ufe0f"),
+    53: ("\u971e\u96e8",          "\U0001f326\ufe0f"),
+    55: ("\u971e\u96e8\uff08\u5f37\uff09",    "\U0001f327\ufe0f"),
+    61: ("\u5c0f\u96e8",          "\U0001f327\ufe0f"),
+    63: ("\u96e8",            "\U0001f327\ufe0f"),
+    65: ("\u5927\u96e8",          "\U0001f327\ufe0f"),
+    71: ("\u5c0f\u96ea",          "\U0001f328\ufe0f"),
+    73: ("\u96ea",            "\u2744\ufe0f"),
+    75: ("\u5927\u96ea",          "\u2744\ufe0f"),
+    80: ("\u306b\u308f\u304b\u96e8",      "\U0001f326\ufe0f"),
+    81: ("\u306b\u308f\u304b\u96e8\uff08\u4e2d\uff09","\U0001f327\ufe0f"),
+    82: ("\u306b\u308f\u304b\u96e8\uff08\u5f37\uff09","\u26c8\ufe0f"),
+    95: ("\u96f7\u96e8",          "\u26c8\ufe0f"),
+    96: ("\u96f7\u96e8+\u3072\u3087\u3046",   "\u26c8\ufe0f"),
+    99: ("\u96f7\u96e8+\u5927\u3072\u3087\u3046", "\u26c8\ufe0f"),
 }
 
-WEEKDAYS_JA = ["月", "火", "水", "木", "金", "土", "日"]
-ROKKI       = ["大安", "赤口", "先勝", "友引", "先負", "仏滅"]
+WEEKDAYS_JA = ["\u6708", "\u706b", "\u6c34", "\u6728", "\u91d1", "\u571f", "\u65e5"]
+ROKKI       = ["\u5927\u5b89", "\u8d64\u53e3", "\u5148\u52dd", "\u53cb\u5f15", "\u5148\u8ca0", "\u4ecf\u6ec5"]
 
-# ── 六曜計算（旧暦 (月+日) % 6 アルゴリズム） ──
 def _julian_day(year, month, day):
     if month <= 2:
         year -= 1
@@ -47,16 +47,15 @@ def _julian_day(year, month, day):
 
 def get_rokki(year, month, day):
     jd = _julian_day(year, month, day)
-    days_since = jd - 2415020.5          # 1900-01-01 基点
+    days_since = jd - 2415020.5
     lunation   = days_since / 29.530588853
     lunar_month = int(lunation % 12) + 1
     lunar_day   = int((lunation % 1) * 29.530588853) + 1
     return ROKKI[(lunar_month + lunar_day) % 6]
-# ────────────────────────────────────────────────
 
 def precip_bar(prob):
     filled = prob // 20
-    return "🟦" * filled + "⬜" * (5 - filled)
+    return "\U0001f7e6" * filled + "\u2b1c" * (5 - filled)
 
 def get_weather():
     url = "https://api.open-meteo.com/v1/forecast"
@@ -81,27 +80,27 @@ def build_message(data):
     now    = datetime.now(JST)
     wday   = WEEKDAYS_JA[now.weekday()]
     rokki  = get_rokki(now.year, now.month, now.day)
-    date_str = now.strftime("%Y年%m月%d日")
+    date_str = now.strftime("%Y\u5e74%m\u6708%d\u65e5")
 
     target_hours = {0, 3, 6, 9, 12, 15, 18, 21}
     rows = []
     for i, t in enumerate(times):
         dt = datetime.fromisoformat(t)
         if dt.hour in target_hours:
-            desc, emoji = WEATHER_CODES.get(codes[i], ("不明", "❓"))
+            desc, emoji = WEATHER_CODES.get(codes[i], ("\u4e0d\u660e", "?"))
             prob = prec_prob[i]
             rows.append(
-                f"`{dt.strftime('%H:%M')}` {emoji} **{desc}**　"
-                f"{temps[i]:.1f}°C　💧{prob:3d}% {precip_bar(prob)}"
+                f"`{dt.strftime('%H:%M')}` {emoji} **{desc}**\u3000"
+                f"{temps[i]:.1f}\u00b0C\u3000\U0001f4a7{prob:3d}% {precip_bar(prob)}"
             )
 
     lines = [
-        f"## 🌅 {LOCATION_NAME}の天気予報 — {date_str}（{wday}）｜{rokki}",
+        f"## \U0001f305 {LOCATION_NAME}\u306e\u5929\u6c17\u4e88\u5831 \u2014 {date_str}\uff08{wday}\uff09\uff5c{rokki}",
         "",
         *rows,
         "",
-        "─────────────────────────",
-        "*データ提供: [Open-Meteo](https://open-meteo.com/) | 3時間ごと全時間帯*",
+        "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "*\u30c7\u30fc\u30bf\u63d0\u4f9b: [Open-Meteo](https://open-meteo.com/) | 3\u6642\u9593\u3054\u3068\u5168\u6642\u9593\u5e2f*",
     ]
     return "\n".join(lines)
 
@@ -112,29 +111,10 @@ def send_to_discord(message):
         timeout=10,
     )
     res.raise_for_status()
-    print("✅ 送信成功")
+    print("OK")
 
 if __name__ == "__main__":
     data = get_weather()
     msg  = build_message(data)
     print(msg)
     send_to_discord(msg)
-```
-
----
-
-### 出力イメージ
-```
-## 🌅 幕張本郷（千葉市花見川区）の天気予報 — 2026年03月21日（土）｜先勝
-
-`00:00` ☀️ **快晴**　6.0°C　💧  0% ⬜⬜⬜⬜⬜
-`03:00` ☀️ **快晴**　5.0°C　💧  0% ⬜⬜⬜⬜⬜
-`06:00` ⛅ **部分的に曇り**　4.0°C　💧  0% ⬜⬜⬜⬜⬜
-`09:00` ⛅ **部分的に曇り**　6.0°C　💧  0% ⬜⬜⬜⬜⬜
-`12:00` ☁️ **曇り**　9.0°C　💧  0% ⬜⬜⬜⬜⬜
-`15:00` ☀️ **快晴**　10.0°C　💧  0% ⬜⬜⬜⬜⬜
-`18:00` 🌦️ **にわか雨**　8.0°C　💧 81% 🟦🟦🟦🟦⬜
-`21:00` ☁️ **曇り**　8.0°C　💧  0% ⬜⬜⬜⬜⬜
-
-─────────────────────────
-*データ提供: Open-Meteo | 3時間ごと全時間帯*

@@ -1,0 +1,28 @@
+name: 毎朝天気通知
+
+on:
+  schedule:
+    - cron: '0 22 * * *'  # UTC 22:00 = JST 07:00
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run weather notify
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          LATITUDE: ${{ vars.LATITUDE }}
+          LONGITUDE: ${{ vars.LONGITUDE }}
+          LOCATION_NAME: ${{ vars.LOCATION_NAME }}
+        run: python weather_notify.py

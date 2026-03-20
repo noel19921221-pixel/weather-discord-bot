@@ -91,7 +91,7 @@ def build_message(data):
             prob = prec_prob[i]
             rows.append(
                 f"`{dt.strftime('%H:%M')}` {emoji} **{desc}**\u3000"
-                f"{temps[i]:.1f}\u00b0C\u3000\U0001f4a7{prob:3d}% {precip_bar(prob)}"
+                f"{temps[i]:.1f}\u00b0C\u3000\U0001f4a7{prob:3d}% "
             )
 
     lines = [

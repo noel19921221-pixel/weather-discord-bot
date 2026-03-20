@@ -4,7 +4,7 @@ import requests
 from datetime import datetime, timezone, timedelta
 
 DISCORD_WEBHOOK_URL = os.environ["DISCORD_WEBHOOK_URL"]
-DISCORD_BOT_TOKEN   = os.environ["DISCORD_BOT_TOKEN"]
+DISCORD_BOT_TOKEN   = os.environ["DISCORD_BOT_TOKEN"].strip()
 DISCORD_CHANNEL_ID  = os.environ["DISCORD_CHANNEL_ID"]
 
 LATITUDE      = float(os.environ.get("LATITUDE",  "35.6374"))
